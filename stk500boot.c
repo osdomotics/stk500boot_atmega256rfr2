@@ -114,7 +114,7 @@ LICENSE:
 
 
 #if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
-	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_)
+	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
 	#undef		ENABLE_MONITOR
 	#define		ENABLE_MONITOR
 	static void	RunMonitor(void);
@@ -128,7 +128,7 @@ LICENSE:
 #endif
 
 //#define	_DEBUG_SERIAL_
-//#define	_DEBUG_WITH_LEDS_
+#define	_DEBUG_WITH_LEDS_
 
 
 /*
@@ -225,6 +225,10 @@ LICENSE:
 	#define PROGLED_PORT	PORTE
 	#define PROGLED_DDR		DDRE
 	#define PROGLED_PIN		PINE5
+#elif defined( _BOARD_RASPBEE_ )
+	#define PROGLED_PORT	PORTG
+	#define PROGLED_DDR		DDRG
+	#define PROGLED_PIN		PINE2
 #else
 	#define PROGLED_PORT	PORTG
 	#define PROGLED_DDR		DDRG
@@ -316,14 +320,14 @@ LICENSE:
 #elif defined (__AVR_AT90USB1287__)
 	#define SIGNATURE_BYTES  0x1e9782
 #elif defined(__AVR_ATmega256RFR2__)
-	#define SIGNATURE_BYTES  0x1ea803
+	#define SIGNATURE_BYTES  0x1ea802
 #elif defined(__AVR_ATmega2564RFR2__)
 	#define SIGNATURE_BYTES  0x1ea803
 #else
 	#error "no signature definition for MCU available"
 #endif
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_)
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
 	#define UART_STATUS_REG 		UCSR0A
 
 	#define UDRE  UDRE0
@@ -409,7 +413,7 @@ LICENSE:
  * Macro to calculate UBBR from XTAL and baudrate
  */
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined( _BOARD_GUHRF_ )
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined( _BOARD_GUHRF_ ) || defined( _BOARD_RASPBEE_ )
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) (xtalCpu / 16 / baudRate - 1)
 #elif defined(__AVR_ATmega32__) && UART_BAUDRATE_DOUBLE_SPEED
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) ((xtalCpu / 4 / baudRate - 1) / 2)
@@ -652,7 +656,7 @@ int main(void)
 	UART_BAUD_RATE_LOW	=	UART_BAUD_SELECT(BAUDRATE,F_CPU);
 	UART_CONTROL_REG	=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_)
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
 /*
 	UCSR1A &= ~(1 << U2X1);
 	UART_CONTROL_REG  |=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);

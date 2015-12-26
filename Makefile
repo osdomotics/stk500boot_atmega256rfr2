@@ -41,7 +41,7 @@ MCU = atmega256rfr2
 #Fuse Settings
 # FUSES      = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
 # guhRF Fuses
-FUSES = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
+FUSES = -U hfuse:w:0x98:m -U lfuse:w:0xce:m
 
 
 # Processor frequency.
@@ -215,13 +215,14 @@ LDFLAGS += -Wl,--section-start=.text=$(BOOTLOADER_ADDRESS)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = usbasp
+#AVRDUDE_PROGRAMMER = usbasp
 #AVRDUDE_PROGRAMMER = stk500
+AVRDUDE_PROGRAMMER = atmelice
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-#AVRDUDE_PORT = usb    # programmer connected to serial device
+AVRDUDE_PORT = usb    # programmer connected to serial device
 #AVRDUDE_PORT = /dev/tty.usbmodemfd141    # programmer connected to serial device
-AVRDUDE_PORT = /dev/ttyUSB0    # programmer connected to serial device
+#AVRDUDE_PORT = /dev/ttyUSB0    # programmer connected to serial device
 
 #AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 AVRDUDE_WRITE_FLASH = -U flash:w:stk500boot_v2_m256rfr2.hex:i
@@ -429,6 +430,19 @@ guhRF: BOOTLOADER_ADDRESS = 3E000
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
 guhRF: begin gccversion sizebefore build sizeafter end 
+			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+
+############################################################
+#	Dec 27, 2015 	Adding RaspBee - atmega256rfr2 support
+#BOOTLOADER_ADDRESS = 3E000 =1F000 x 2 -- BootSZ Fuse Bits = 00 4096 Words/32Pages
+#x2 because we're addressing in bytes, not words.
+raspbee: MCU = atmega256rfr2
+raspbee: F_CPU = 16000000
+raspbee: BOOTLOADER_ADDRESS = 3E000 
+#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
+#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
+raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+raspbee: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 # Default target.
