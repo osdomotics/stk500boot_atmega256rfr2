@@ -114,7 +114,7 @@ LICENSE:
 
 
 #if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
-	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ )
+	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_)
 	#undef		ENABLE_MONITOR
 	#define		ENABLE_MONITOR
 	static void	RunMonitor(void);
@@ -221,6 +221,10 @@ LICENSE:
 	#define PROGLED_PORT	PORTB
 	#define PROGLED_DDR		DDRB
 	#define PROGLED_PIN		PINB1
+#elif defined( _BOARD_GUHRF_ )
+	#define PROGLED_PORT	PORTE
+	#define PROGLED_DDR		DDRE
+	#define PROGLED_PIN		PINE5
 #else
 	#define PROGLED_PORT	PORTG
 	#define PROGLED_DDR		DDRG
@@ -319,7 +323,7 @@ LICENSE:
 	#error "no signature definition for MCU available"
 #endif
 
-#if defined(_BOARD_MESHTHING_2564RFR2_)
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_)
 	#define UART_STATUS_REG 		UCSR0A
 
 	#define UDRE  UDRE0
@@ -405,7 +409,7 @@ LICENSE:
  * Macro to calculate UBBR from XTAL and baudrate
  */
 
-#if defined(_BOARD_MESHTHING_2564RFR2_)
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined( _BOARD_GUHRF_ )
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) (xtalCpu / 16 / baudRate - 1)
 #elif defined(__AVR_ATmega32__) && UART_BAUDRATE_DOUBLE_SPEED
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) ((xtalCpu / 4 / baudRate - 1) / 2)
@@ -648,7 +652,7 @@ int main(void)
 	UART_BAUD_RATE_LOW	=	UART_BAUD_SELECT(BAUDRATE,F_CPU);
 	UART_CONTROL_REG	=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);
 
-#if defined(_BOARD_MESHTHING_2564RFR2_)
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_)
 /*
 	UCSR1A &= ~(1 << U2X1);
 	UART_CONTROL_REG  |=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);

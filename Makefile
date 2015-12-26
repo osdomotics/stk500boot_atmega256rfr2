@@ -36,10 +36,13 @@
 
 # MCU name
 #MCU = atmega128
-MCU = atmega2564rfr2
+MCU = atmega256rfr2
 
 #Fuse Settings
-FUSES      = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
+# FUSES      = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
+# guhRF Fuses
+FUSES = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
+
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
@@ -216,8 +219,9 @@ AVRDUDE_PROGRAMMER = usbasp
 #AVRDUDE_PROGRAMMER = stk500
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = usb    # programmer connected to serial device
+#AVRDUDE_PORT = usb    # programmer connected to serial device
 #AVRDUDE_PORT = /dev/tty.usbmodemfd141    # programmer connected to serial device
+AVRDUDE_PORT = /dev/ttyUSB0    # programmer connected to serial device
 
 #AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 AVRDUDE_WRITE_FLASH = -U flash:w:stk500boot_v2_m256rfr2.hex:i
@@ -414,6 +418,18 @@ meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -D_DEBUG_SERIAL_
 meshthing: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
+############################################################
+#	Dec 27, 2015 	Adding guhRF - atmega256rfr2 support
+#BOOTLOADER_ADDRESS = 3E000 =1F000 x 2 -- BootSZ Fuse Bits = 00 4096 Words/32Pages
+#x2 because we're addressing in bytes, not words.
+guhRF: MCU = atmega256rfr2
+guhRF: F_CPU = 16000000
+guhRF: BOOTLOADER_ADDRESS = 3E000 
+#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
+#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
+guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+guhRF: begin gccversion sizebefore build sizeafter end 
+			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 # Default target.
 all: begin gccversion sizebefore build sizeafter end
