@@ -41,7 +41,7 @@ MCU = atmega256rfr2
 #Fuse Settings
 # FUSES      = -U hfuse:w:0xd8:m -U lfuse:w:0xef:m
 # guhRF Fuses
-FUSES = -U hfuse:w:0x98:m -U lfuse:w:0xce:m
+FUSES = -U hfuse:w:0x98:m -U lfuse:w:0xf6:m -U efuse:w:0xfe:m
 
 
 # Processor frequency.
@@ -427,8 +427,8 @@ guhRF: MCU = atmega256rfr2
 guhRF: F_CPU = 16000000
 guhRF: BOOTLOADER_ADDRESS = 3E000 
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
-#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
-guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
+#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
 guhRF: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
@@ -440,8 +440,8 @@ raspbee: MCU = atmega256rfr2
 raspbee: F_CPU = 16000000
 raspbee: BOOTLOADER_ADDRESS = 3E000 
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
-#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
-raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
+#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
 raspbee: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 

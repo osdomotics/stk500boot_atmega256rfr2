@@ -250,7 +250,7 @@ LICENSE:
  */
 
 #ifndef BAUDRATE
-	#define BAUDRATE 115200
+	#define BAUDRATE 57600
 #endif
 
 /*
@@ -676,7 +676,7 @@ int main(void)
 	#  define UBRR UBRR0L
 	#  define UDR UDR0
 
-	#define BAUDRATE 115200
+	#define BAUDRATE 57600
 //	#define BAUD_PRESCALE (F_CPU / 16 / BAUDRATE -1)   
 
 //trying double speed as it has less error at 115200...
