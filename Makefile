@@ -61,6 +61,19 @@ F_CPU = 16000000
 #BOOTLOADER_ADDRESS = 1E000
 
 
+# By default we use the manually-assigned VMWare range of MAC addresses
+# VMWare Range is 00:50:56:XX:YY:ZZ
+# Where XX is a between 00 and 3F and YY and ZZ are between 00 and FF.
+# From this we generate the EUI64.
+# But you really should assign the address that is printed on your Board!
+SED              = sed
+EUI64_ADDRESS    = 00:50:56:FF:FF:03:04:05
+PARAMS_EUI64ADDR =                                              \
+    $(shell echo ${EUI64_ADDRESS}                               \
+     | $(SED) -e 's/^/{0x/' -e 's/[:-]/, 0x/g' -e 's/$$/}/'     \
+     )
+
+
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 
@@ -80,7 +93,8 @@ SRC = stk500boot.c
 #     Even though the DOS/Win* filesystem matches both .s and .S the same,
 #     it will preserve the spelling of the filenames, and gcc itself does
 #     care about how the name is spelled on its command-line.
-ASRC = 
+# jumptable.S is the storage for the MAC Address for guhRF devices 
+ASRC = jumptable.S
 
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
@@ -426,9 +440,10 @@ meshthing: begin gccversion sizebefore build sizeafter end
 guhRF: MCU = atmega256rfr2
 guhRF: F_CPU = 16000000
 guhRF: BOOTLOADER_ADDRESS = 3E000 
+guhRF: LDFLAGS  += -Wl,--section-start=.jumps=0x3FF80
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
-guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
-#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+#guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
+guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_ -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 guhRF: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
@@ -439,9 +454,10 @@ guhRF: begin gccversion sizebefore build sizeafter end
 raspbee: MCU = atmega256rfr2
 raspbee: F_CPU = 16000000
 raspbee: BOOTLOADER_ADDRESS = 3E000 
+raspbee: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
-raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
-#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_
+#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
+raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_ -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 raspbee: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 

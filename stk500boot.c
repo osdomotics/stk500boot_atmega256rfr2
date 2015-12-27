@@ -564,6 +564,10 @@ uint32_t count = 0;
 void (*app_start)(void) = 0x0000;
 
 
+/* IEU64 Mac address */
+const uint8_t default_mac_address[8] PROGMEM = PARAMS_EUI64ADDR;
+
+
 //*****************************************************************************
 int main(void)
 {
@@ -1273,23 +1277,6 @@ int main(void)
 	for(;;);
 }
 
-/*
-base address = f800
-
-avrdude: Device signature = 0x1e9703
-avrdude: safemode: lfuse reads as FF
-avrdude: safemode: hfuse reads as DA
-avrdude: safemode: efuse reads as F5
-avrdude>
-
-
-base address = f000
-avrdude: Device signature = 0x1e9703
-avrdude: safemode: lfuse reads as FF
-avrdude: safemode: hfuse reads as D8
-avrdude: safemode: efuse reads as F5
-avrdude>
-*/
 
 //************************************************************************
 #ifdef ENABLE_MONITOR
@@ -2207,4 +2194,17 @@ int				ii, jj;
 }
 
 #endif
+
+// Hack: padding so that _get_mac will have the old address, so we're
+// compatible with compiled applications that aren't aware of the new
+// jumptable address. Note that this is needed because the gcc-avr that
+// comes with debian wheezy optimizes a little better than the old one
+// from debian squeeze.
+const uint8_t padding [28] PROGMEM = {1, 2};
+
+uint8_t _get_mac(uint8_t index)
+{
+	return pgm_read_byte_far
+            (pgm_get_far_address (default_mac_address) + index);
+}
 
