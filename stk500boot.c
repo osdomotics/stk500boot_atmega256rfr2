@@ -128,7 +128,7 @@ LICENSE:
 #endif
 
 //#define	_DEBUG_SERIAL_
-#define	_DEBUG_WITH_LEDS_
+//#define	_DEBUG_WITH_LEDS_
 
 
 /*
@@ -144,9 +144,10 @@ LICENSE:
 //************************************************************************
 //*	LED on pin "PROGLED_PIN" on port "PROGLED_PORT"
 //*	indicates that bootloader is active
-//*	PG2 -> LED on Wiring board
+//*	PE5 -> LED on guhRF
+//*     PG2 -> LED on RaspBee
 //************************************************************************
-#define		BLINK_LED_WHILE_WAITING
+#define	 BLINK_LED_WHILE_WAITING
 
 #ifdef _MEGA_BOARD_
 	#define PROGLED_PORT	PORTB
@@ -226,9 +227,15 @@ LICENSE:
 	#define PROGLED_DDR		DDRE
 	#define PROGLED_PIN		PINE5
 #elif defined( _BOARD_RASPBEE_ )
-	#define PROGLED_PORT	PORTG
+	#define PROGLED_PORT		PORTG
 	#define PROGLED_DDR		DDRG
 	#define PROGLED_PIN		PINE2
+	#define BOOT_PIN_EN		1
+	#define BOOT_PORT		PORTB
+	#define BOOT_DDR		DDRB
+	#define BOOT_PIN		PINB7
+	#define BOOT_PIN_REG		PINB
+	
 #else
 	#define PROGLED_PORT	PORTG
 	#define PROGLED_DDR		DDRG
@@ -629,13 +636,19 @@ int main(void)
 #else
 	boot_timeout	=	3500000; // 7 seconds , approx 2us per step when optimize "s"
 #endif
+
+#ifdef BOOT_PIN_EN
+	/* if bOOT pin is low the enter the bootloader */
+	BOOT_DDR	&= ~(1<<BOOT_PIN); // Input
+	BOOT_PORT	|=  (1<<BOOT_PIN); // Pull-Up
+#endif
 	/*
 	 * Branch to bootloader or application code ?
 	 */
 
 #ifndef REMOVE_BOOTLOADER_LED
 	/* PROG_PIN pulled low, indicate with LED that bootloader is active */
-	PROGLED_DDR		|=	(1<<PROGLED_PIN);
+	PROGLED_DDR	|=	(1<<PROGLED_PIN);
 //	PROGLED_PORT	&=	~(1<<PROGLED_PIN);	// active low LED ON
 	PROGLED_PORT	|=	(1<<PROGLED_PIN);	// active high LED ON
 
@@ -747,8 +760,11 @@ int main(void)
 		boot_state++; // ( if boot_state=1 bootloader received byte from UART, enter bootloader mode)
 	}
 
-
-	if (boot_state==1)
+#ifdef BOOT_PIN_EN
+	if ((boot_state==1) && (!(BOOT_PIN_REG &(1<<BOOT_PIN))))
+#else
+	if ((boot_state==1)
+#endif
 	{
 		//*	main loop
 //		sendchar('m');

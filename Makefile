@@ -457,7 +457,7 @@ raspbee: BOOTLOADER_ADDRESS = 3E000
 raspbee: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
-raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_ -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
+raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 raspbee: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
