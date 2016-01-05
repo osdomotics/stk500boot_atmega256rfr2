@@ -1270,12 +1270,15 @@ int main(void)
 
 
 #ifndef REMOVE_BOOTLOADER_LED
-	PROGLED_DDR		&=	~(1<<PROGLED_PIN);	// set to default
+	PROGLED_DDR	&=	~(1<<PROGLED_PIN);	// set to default
 	PROGLED_PORT	&=	~(1<<PROGLED_PIN);	// active low LED OFF
 //	PROGLED_PORT	|=	(1<<PROGLED_PIN);	// active high LED OFf
 	delay_ms(100);							// delay after exit
 #endif
 
+#ifdef BOOT_PIN_EN
+	STATUSLED_PORT	&=	~(1<<STATUSLED_PIN);	// active low LED OFF
+#endif
 
 	asm volatile ("nop");			// wait until port has changed
 
