@@ -229,7 +229,12 @@ LICENSE:
 #elif defined( _BOARD_RASPBEE_ )
 	#define PROGLED_PORT		PORTG
 	#define PROGLED_DDR		DDRG
-	#define PROGLED_PIN		PINE2
+	#define PROGLED_PIN		PING2
+
+	#define STATUSLED_PORT		PORTD
+	#define STATUSLED_DDR		DDRD
+	#define STATUSLED_PIN		PIND7
+
 	#define BOOT_PIN_EN		1
 	#define BOOT_PORT		PORTB
 	#define BOOT_DDR		DDRB
@@ -641,6 +646,13 @@ int main(void)
 	/* if bOOT pin is low the enter the bootloader */
 	BOOT_DDR	&= ~(1<<BOOT_PIN); // Input
 	BOOT_PORT	|=  (1<<BOOT_PIN); // Pull-Up
+	STATUSLED_DDR	|=  (1<<STATUSLED_PIN);
+	STATUSLED_PORT	|=  (1<<STATUSLED_PIN);
+	
+	if (!(BOOT_PIN_REG &(1<<BOOT_PIN))){
+		STATUSLED_PORT |= (1<<STATUSLED_PIN);	// turn LED on
+	}
+
 #endif
 	/*
 	 * Branch to bootloader or application code ?
