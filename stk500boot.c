@@ -491,9 +491,9 @@ void __jumpMain(void)
 	asm volatile ( "ldi	16, %0" :: "i" (RAMEND & 0x0ff) );
 	asm volatile ( "out %0,16" :: "i" (AVR_STACK_POINTER_LO_ADDR) );
 
-	asm volatile ( "clr __zero_reg__" );									// GCC depends on register r1 set to 0
+	asm volatile ( "clr __zero_reg__" );					// GCC depends on register r1 set to 0
 	asm volatile ( "out %0, __zero_reg__" :: "I" (_SFR_IO_ADDR(SREG)) );	// set SREG to 0
-	asm volatile ( "jmp main");												// jump to main()
+	asm volatile ( "jmp main");						// jump to main()
 }
 
 
@@ -514,9 +514,9 @@ void delay_ms(unsigned int timedelay)
  */
 static void sendchar(char c)
 {
-	UART_DATA_REG	=	c;										// prepare transmission
+	UART_DATA_REG	=	c;					// prepare transmission
 	while (!(UART_STATUS_REG & (1 << UART_TRANSMIT_COMPLETE)));	// wait until byte sent
-	UART_STATUS_REG |= (1 << UART_TRANSMIT_COMPLETE);			// delete TXCflag
+	UART_STATUS_REG |= (1 << UART_TRANSMIT_COMPLETE);		// delete TXCflag
 }
 
 
@@ -636,8 +636,6 @@ int main(void)
 
 #ifdef BLINK_LED_WHILE_WAITING
 	boot_timeout	=	 90000;		//*	should be about 4 seconds
-//	boot_timeout	=	170000;
-//	boot_timeout	=	 20000;		//*	should be about 1 second
 #else
 	boot_timeout	=	3500000; // 7 seconds , approx 2us per step when optimize "s"
 #endif
@@ -650,7 +648,7 @@ int main(void)
 	STATUSLED_PORT	|=  (1<<STATUSLED_PIN);
 	
 	if (!(BOOT_PIN_REG &(1<<BOOT_PIN))){
-		STATUSLED_PORT |= (1<<STATUSLED_PIN);	// turn LED on
+		STATUSLED_PORT &= ~(1<<STATUSLED_PIN);	// turn LED on
 	}
 
 #endif
@@ -1272,12 +1270,11 @@ int main(void)
 #ifndef REMOVE_BOOTLOADER_LED
 	PROGLED_DDR	&=	~(1<<PROGLED_PIN);	// set to default
 	PROGLED_PORT	&=	~(1<<PROGLED_PIN);	// active low LED OFF
-//	PROGLED_PORT	|=	(1<<PROGLED_PIN);	// active high LED OFf
-	delay_ms(100);							// delay after exit
+	delay_ms(100);					// delay after exit
 #endif
 
 #ifdef BOOT_PIN_EN
-	STATUSLED_PORT	&=	~(1<<STATUSLED_PIN);	// active low LED OFF
+	STATUSLED_PORT	|=	(1<<STATUSLED_PIN);	// active low LED OFF
 #endif
 
 	asm volatile ("nop");			// wait until port has changed
