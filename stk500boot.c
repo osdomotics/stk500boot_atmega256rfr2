@@ -643,11 +643,11 @@ int main(void)
 #ifdef BOOT_PIN_EN
 	/* if bOOT pin is low the enter the bootloader */
 	BOOT_DDR	&= ~(1<<BOOT_PIN); // Input
-	BOOT_PORT	|=  (1<<BOOT_PIN); // Pull-Up
+	BOOT_PORT	&= ~(1<<BOOT_PIN); // no Pull-Up
 	STATUSLED_DDR	|=  (1<<STATUSLED_PIN);
 	STATUSLED_PORT	|=  (1<<STATUSLED_PIN);
 	
-	if (!(BOOT_PIN_REG &(1<<BOOT_PIN))){
+	if (BOOT_PIN_REG &(1<<BOOT_PIN)){
 		STATUSLED_PORT &= ~(1<<STATUSLED_PIN);	// turn LED on
 	}
 
@@ -771,7 +771,7 @@ int main(void)
 	}
 
 #ifdef BOOT_PIN_EN
-	if ((boot_state==1) && (!(BOOT_PIN_REG &(1<<BOOT_PIN))))
+	if ((boot_state==1) && (BOOT_PIN_REG &(1<<BOOT_PIN)))
 #else
 	if ((boot_state==1)
 #endif
