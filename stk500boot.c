@@ -114,7 +114,7 @@ LICENSE:
 
 
 #if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
-	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
+	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
 	#undef		ENABLE_MONITOR
 	#define		ENABLE_MONITOR
 	static void	RunMonitor(void);
@@ -223,9 +223,16 @@ LICENSE:
 	#define PROGLED_DDR		DDRB
 	#define PROGLED_PIN		PINB1
 #elif defined( _BOARD_GUHRF_ )
-	#define PROGLED_PORT	PORTE
+	#define PROGLED_PORT	        PORTE
 	#define PROGLED_DDR		DDRE
 	#define PROGLED_PIN		PINE5
+
+#elif defined( OSD_TARGET )
+/* onboard LED for the OSD Merkur is connected to pin PE5 (avoid spi pins PB1 SCK) */
+	#define PROGLED_PORT	        PORTE
+	#define PROGLED_DDR		DDRE
+	#define PROGLED_PIN		PINE5
+
 #elif defined( _BOARD_RASPBEE_ )
 	#define PROGLED_PORT		PORTG
 	#define PROGLED_DDR		DDRG
@@ -339,7 +346,7 @@ LICENSE:
 	#error "no signature definition for MCU available"
 #endif
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
 	#define UART_STATUS_REG 		UCSR0A
 
 	#define UDRE  UDRE0
@@ -425,7 +432,7 @@ LICENSE:
  * Macro to calculate UBBR from XTAL and baudrate
  */
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined( _BOARD_GUHRF_ ) || defined( _BOARD_RASPBEE_ )
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined( _BOARD_GUHRF_ ) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) (xtalCpu / 16 / baudRate - 1)
 #elif defined(__AVR_ATmega32__) && UART_BAUDRATE_DOUBLE_SPEED
 	#define UART_BAUD_SELECT(baudRate,xtalCpu) ((xtalCpu / 4 / baudRate - 1) / 2)
@@ -683,7 +690,7 @@ int main(void)
 	UART_BAUD_RATE_LOW	=	UART_BAUD_SELECT(BAUDRATE,F_CPU);
 	UART_CONTROL_REG	=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);
 
-#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ )
+#if defined(_BOARD_MESHTHING_2564RFR2_) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
 /*
 	UCSR1A &= ~(1 << U2X1);
 	UART_CONTROL_REG  |=	(1 << UART_ENABLE_RECEIVER) | (1 << UART_ENABLE_TRANSMITTER);
@@ -773,7 +780,7 @@ int main(void)
 #ifdef BOOT_PIN_EN
 	if ((boot_state==1) && (BOOT_PIN_REG &(1<<BOOT_PIN)))
 #else
-	if ((boot_state==1)
+	if (boot_state==1)
 #endif
 	{
 		//*	main loop

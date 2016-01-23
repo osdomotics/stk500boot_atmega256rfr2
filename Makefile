@@ -443,7 +443,7 @@ guhRF: BOOTLOADER_ADDRESS = 3E000
 guhRF: LDFLAGS  += -Wl,--section-start=.jumps=0x3FF80
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
-guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -D_DEBUG_SERIAL_ -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
+guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 guhRF: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
@@ -460,6 +460,21 @@ raspbee: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
 raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 raspbee: begin gccversion sizebefore build sizeafter end 
 			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+
+############################################################
+#	Dec 27, 2015 	Adding Merkur Board - atmega256rfr2 support
+#BOOTLOADER_ADDRESS = 3E000 =1F000 x 2 -- BootSZ Fuse Bits = 00 4096 Words/32Pages
+#x2 because we're addressing in bytes, not words.
+osd: MCU = atmega256rfr2
+osd: F_CPU = 16000000
+osd: BOOTLOADER_ADDRESS = 3E000 
+osd: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
+osd: OSD_TARGET = merkur
+osd: CFLAGS += '-DOSD_TARGET=$(OSD_TARGET)'
+osd: CFLAGS += -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
+osd: begin gccversion sizebefore build sizeafter end 
+			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+
 
 # Default target.
 all: begin gccversion sizebefore build sizeafter end
