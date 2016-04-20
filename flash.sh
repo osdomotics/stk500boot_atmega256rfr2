@@ -15,24 +15,32 @@ function printRed() {
     echo -e "${BASH_RED}$1${BASH_NORMAL}"
 }
 
-if [ "$UID" -ne 0 ]; then
-    printRed "start the script as root"
-    exit
-fi
+#if [ "$UID" -ne 0 ]; then
+#    printRed "start the script as root"
+#    exit
+#fi
 
 
 echo -n -e "${BASH_GREEN}Enter MAC Address>${BASH_NORMAL}"
 read mac
 make clean
 
+MCU=atmega256rfr2
+
 PS3='Please enter your platform: '
-options=("Merkur Board" "guhRF" "RaspBee" "Quit")
+options=("Merkur Board with atmega128rfa1" "Merkur Board with atmega256rfr2" "guhRF" "RaspBee" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
-        "Merkur Board")
-            printGreen "you chose Merkur Board"
-            TARGET='osd'
+        "Merkur Board with atmega128rfa1")
+            printGreen "you chose Merkur Board with atmega128rfa1"
+            TARGET='osd-128'
+            MCU=atmega128rfa1
+            break
+            ;;
+        "Merkur Board with atmega256rfr2")
+            printGreen "you chose Merkur Board with atmega256rfr2"
+            TARGET='osd-256'
             break
             ;;
         "guhRF")
@@ -56,4 +64,4 @@ done
 printGreen "Building with Target: ${TARGET}"
 make ${TARGET} EUI64_ADDRESS="$mac"
 printGreen "start flashing"
-sudo make flash
+sudo make MCU=$MCU flash

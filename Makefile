@@ -231,17 +231,17 @@ LDFLAGS += -Wl,--section-start=.text=$(BOOTLOADER_ADDRESS)
 #
 #AVRDUDE_PROGRAMMER = usbasp
 #AVRDUDE_PROGRAMMER = stk500
-AVRDUDE_PROGRAMMER = atmelice
+#AVRDUDE_PROGRAMMER = atmelice
+AVRDUDE_PROGRAMMER = dragon_jtag
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb    # programmer connected to serial device
 #AVRDUDE_PORT = /dev/tty.usbmodemfd141    # programmer connected to serial device
 #AVRDUDE_PORT = /dev/ttyUSB0    # programmer connected to serial device
 
-#AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
-AVRDUDE_WRITE_FLASH = -U flash:w:stk500boot_v2_m256rfr2.hex:i
+AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex:i
 
-#AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
+AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 
 
 # Uncomment the following if you want avrdude's erase cycle counter.
@@ -356,7 +356,7 @@ mega1280: F_CPU = 16000000
 mega1280: BOOTLOADER_ADDRESS = 1E000
 mega1280: CFLAGS += -D_MEGA_BOARD_
 mega1280: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_mega1280.hex
+			cp $(TARGET).hex stk500boot_v2_mega1280.hex
 
 
 ############################################################
@@ -366,7 +366,7 @@ mega2560:	F_CPU = 16000000
 mega2560:	BOOTLOADER_ADDRESS = 3E000
 mega2560:	CFLAGS += -D_MEGA_BOARD_
 mega2560:	begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_mega2560.hex
+			cp $(TARGET).hex stk500boot_v2_mega2560.hex
 
 
 ############################################################
@@ -383,7 +383,7 @@ amber128: F_CPU = 14745600
 amber128: BOOTLOADER_ADDRESS = 1E000
 amber128: CFLAGS += -D_BOARD_AMBER128_
 amber128: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_amber128.hex
+			cp $(TARGET).hex stk500boot_v2_amber128.hex
 
 ############################################################
 #	Aug 23, 2010 	<MLS> Adding atmega2561 support
@@ -392,7 +392,7 @@ m2561: F_CPU = 8000000
 m2561: BOOTLOADER_ADDRESS = 3E000
 m2561: CFLAGS += -D_ANDROID_2561_ -DBAUDRATE=57600
 m2561: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_android2561.hex
+			cp $(TARGET).hex stk500boot_v2_android2561.hex
 
 
 ############################################################
@@ -408,7 +408,7 @@ cerebot:	F_CPU = 8000000
 cerebot:	BOOTLOADER_ADDRESS = 3E000
 cerebot:	CFLAGS += -D_CEREBOTPLUS_BOARD_ -DBAUDRATE=38400 -DUART_BAUDRATE_DOUBLE_SPEED=1
 cerebot:	begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_cerebotplus.hex
+			cp $(TARGET).hex stk500boot_v2_cerebotplus.hex
 
 
 ############################################################
@@ -418,7 +418,7 @@ penguino: F_CPU = 16000000
 penguino: BOOTLOADER_ADDRESS = 7800
 penguino: CFLAGS += -D_PENGUINO_ -DBAUDRATE=57600
 penguino: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_penguino.hex
+			cp $(TARGET).hex stk500boot_v2_penguino.hex
 
 ############################################################
 #	Jul 17, 2013 	<RDP> Adding atmega256rfr2 support
@@ -431,7 +431,7 @@ meshthing: BOOTLOADER_ADDRESS = 3E000
 #meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -D_DEBUG_SERIAL_
 meshthing: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
 #	Dec 27, 2015 	Adding guhRF - atmega256rfr2 support
@@ -445,7 +445,7 @@ guhRF: LDFLAGS  += -Wl,--section-start=.jumps=0x3FF80
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 guhRF: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
 #	Dec 27, 2015 	Adding RaspBee - atmega256rfr2 support
@@ -459,21 +459,28 @@ raspbee: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
 raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 raspbee: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
-#	Dec 27, 2015 	Adding Merkur Board - atmega256rfr2 support
-#BOOTLOADER_ADDRESS = 3E000 =1F000 x 2 -- BootSZ Fuse Bits = 00 4096 Words/32Pages
-#x2 because we're addressing in bytes, not words.
-osd: MCU = atmega256rfr2
+#	Merkur Board - atmega256rfr2 and atmega256rfr2 support
 osd: F_CPU = 16000000
-osd: BOOTLOADER_ADDRESS = 3E000 
-osd: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
+osd: JUMPTABLE_ADDR = \
+    $(shell echo $(BOOTLOADER_ADDRESS) | sed -e 's/E000$$/FF80/')
+osd: LDFLAGS += -Wl,--section-start=.jumps=$(JUMPTABLE_ADDR)
 osd: OSD_TARGET = merkur
 osd: CFLAGS += '-DOSD_TARGET=$(OSD_TARGET)'
 osd: CFLAGS += -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
 osd: begin gccversion sizebefore build sizeafter end 
-			mv $(TARGET).hex stk500boot_v2_m256rfr2.hex
+	cp $(TARGET).hex stk500boot_v2_$(MCU).hex
+
+# Two variants: One with atmega256rfr2, one with atmega128rfa1
+osd-128: osd
+osd-128: MCU = atmega128rfa1
+osd-128: BOOTLOADER_ADDRESS = 1E000
+
+osd-256: osd
+osd-256: MCU = atmega256rfr2
+osd-256: BOOTLOADER_ADDRESS = 3E000
 
 
 # Default target.
@@ -524,7 +531,7 @@ gccversion :
 
 # Program the device.  
 flash: $(TARGET).hex $(TARGET).eep
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(FUSES)

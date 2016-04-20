@@ -338,6 +338,8 @@ LICENSE:
 	#define SIGNATURE_BYTES  0x1e9405
 #elif defined (__AVR_AT90USB1287__)
 	#define SIGNATURE_BYTES  0x1e9782
+#elif defined(__AVR_ATmega128RFA1__)
+	#define SIGNATURE_BYTES  0x1ea701
 #elif defined(__AVR_ATmega256RFR2__)
 	#define SIGNATURE_BYTES  0x1ea802
 #elif defined(__AVR_ATmega2564RFR2__)
@@ -584,7 +586,7 @@ void (*app_start)(void) = 0x0000;
 
 
 /* IEU64 Mac address */
-const uint8_t default_mac_address[8] PROGMEM = PARAMS_EUI64ADDR;
+const uint8_t default_mac_address[] PROGMEM = PARAMS_EUI64ADDR;
 
 
 //*****************************************************************************
@@ -2230,16 +2232,14 @@ int				ii, jj;
 
 #endif
 
-// Hack: padding so that _get_mac will have the old address, so we're
-// compatible with compiled applications that aren't aware of the new
-// jumptable address. Note that this is needed because the gcc-avr that
-// comes with debian wheezy optimizes a little better than the old one
-// from debian squeeze.
-const uint8_t padding [28] PROGMEM = {1, 2};
-
+/*
+ * Routine to get mac address stored in bootloader area
+ */
 uint8_t _get_mac(uint8_t index)
 {
+	if (index >= sizeof (default_mac_address)) {
+	    return 0;
+	}
 	return pgm_read_byte_far
             (pgm_get_far_address (default_mac_address) + index);
 }
-
