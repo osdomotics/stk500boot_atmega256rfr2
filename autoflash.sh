@@ -29,9 +29,5 @@ make clean
 #sudo make osd_isp
 MCU=atmega256rfr2
 TARGET='osd-256'
-printGreen "Building with Target: ${TARGET}"
 make ${TARGET} EUI64_ADDRESS="$mac"
-printGreen "start flashing"
 sudo make MCU=$MCU flash
-
-
