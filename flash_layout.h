@@ -29,6 +29,8 @@
 #define PART_IRQVEC_SIZE 0x200
 #define PART_IRQVEC_START 0x0
 
+#define ABS_IRQVEC_START 0x0
+
 #define PART_IMAGES_START 0x0
 
 #define PART_START(n) (PART_IMAGES_START + (PART_SIZE * n))
@@ -69,7 +71,13 @@ uint32_t _get_part_start   (uint32_t part_index);
 void     _set_part_ok      (uint32_t part_index);
 void     _clr_part_ok      (uint32_t part_index);
 void     _set_boot_default (uint32_t part_index);
+uint32_t _get_boot_default (void);
 void     _set_boot_next    (uint32_t part_index);
+uint32_t _get_boot_next    (void);
+uint32_t _get_callers_part (void);
+void     _backup_irq_table (uint32_t part_index);
+
+void     update_irq_table  (uint32_t part_index);
 
 void fd_read_directory  (struct flash_directory_s *result);
 void fd_write_directory (struct flash_directory_s *target);

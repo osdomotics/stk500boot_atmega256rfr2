@@ -49,6 +49,11 @@ static void _set_part_ok_ (uint32_t part_index, uint32_t value)
   }
 }
 
+uint32_t _get_callers_part ()
+{
+  return CALLERS_PART;
+}
+
 void _set_part_ok (uint32_t part_index)
 {
   _set_part_ok_ (part_index, 1);
@@ -67,8 +72,18 @@ void _set_boot_default (uint32_t part_index)
 
   if ((part_index < PART_COUNT) && (fd.part_ok [part_index] == 1)) {
     fd.boot_default = part_index;
+    fd.boot_next    = part_index;
     fd_write_directory (&fd);
   }
+}
+
+uint32_t _get_boot_default ()
+{
+  struct flash_directory_s fd;
+
+  fd_read_directory (&fd);
+
+  return fd.boot_default;
 }
 
 void _set_boot_next (uint32_t part_index)
@@ -79,6 +94,69 @@ void _set_boot_next (uint32_t part_index)
     fd_read_directory (&fd);
     fd.boot_next = part_index;
     fd_write_directory (&fd);
+  }
+}
+
+uint32_t _get_boot_next ()
+{
+  struct flash_directory_s fd;
+
+  fd_read_directory (&fd);
+
+  return fd.boot_next;
+}
+
+void _backup_irq_table (uint32_t part_index)
+{
+  address_t src_address;
+  unsigned char data [SPM_PAGESIZE];
+  uint16_t p_count, b_count;
+
+  src_address = _get_part_start (part_index);
+
+  for (p_count = 0; p_count < (PART_IRQVEC_SIZE / SPM_PAGESIZE); p_count ++) {
+    for (b_count = 0; b_count < SPM_PAGESIZE; b_count ++) {
+      data [b_count] = pgm_read_byte_far (src_address++);
+    }
+    _write_page_to_flash
+      ( PART_IRQVEC_BACKUP_START(part_index) + SPM_PAGESIZE * p_count
+      , SPM_PAGESIZE
+      , data
+      );
+  }
+}
+
+void update_irq_table (uint32_t part_index)
+{
+  uint8_t is_equal = 1;
+  uint16_t cnt, p_count, b_count;
+  address_t src_address, dst_address;
+  unsigned char data [SPM_PAGESIZE];
+
+  src_address = PART_IRQVEC_BACKUP_START(part_index);
+  dst_address = ABS_IRQVEC_START;
+
+  for (cnt = 0; cnt < PART_IRQVEC_SIZE; cnt++) {
+    if (pgm_read_byte_far (src_address++) != pgm_read_byte_far (dst_address++)) {
+      is_equal = 0;
+      break;
+    }
+  }
+
+  if (is_equal != 1) {
+    src_address = PART_IRQVEC_BACKUP_START(part_index);
+    dst_address = ABS_IRQVEC_START;
+
+    for (p_count = 0; p_count < (PART_IRQVEC_SIZE / SPM_PAGESIZE); p_count ++) {
+      for (b_count = 0; b_count < SPM_PAGESIZE; b_count ++) {
+        data [b_count] = pgm_read_byte_far (src_address++);
+      }
+      _write_page_to_flash
+        ( dst_address + SPM_PAGESIZE * p_count
+        , SPM_PAGESIZE
+        , data
+        );
+    }
   }
 }
 
@@ -152,7 +230,7 @@ void fd_read_directory (struct flash_directory_s *result)
 
 void fd_write_directory (struct flash_directory_s *target) {
   int current_dir = fd_get_current_directory ();
-  uint32_t dest_address;
+  address_t dest_address;
 
   target->change_count ++;
 

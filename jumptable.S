@@ -37,3 +37,14 @@ set_boot_default:
 set_boot_next:
     jmp _set_boot_next
 
+backup_irq_table:
+    jmp _backup_irq_table
+
+get_boot_default:
+    jmp _get_boot_default
+
+get_boot_next:
+    jmp _get_boot_next
+
+get_callers_part:
+    jmp _get_callers_part

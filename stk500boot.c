@@ -52,7 +52,7 @@ NOTES:
     Based on Atmel Application Note AVR068 - STK500v2 Protocol
 
 LICENSE:
-    Copyright (C) 2006 Peter Fleury
+    Copyright (C) 2006-2017 Peter Fleury
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,6 +112,7 @@ LICENSE:
 #include	<stdlib.h>
 #include	"command.h"
 #include        "flash_write.h"
+#include        "flash_layout.h"
 
 #if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
 	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
@@ -1242,9 +1243,16 @@ int main(void)
 	 * Now leave bootloader
 	 */
 
+        uint32_t to_boot = _get_boot_next ();
+
+        if (to_boot != _get_boot_default ()) {
+                _set_boot_next (_get_boot_default ());
+        }
+
+        update_irq_table (to_boot);
+
 	UART_STATUS_REG	&=	0xfd;
 	boot_rww_enable();				// enable application section
-
 
 	asm volatile(
 			"clr	r30		\n\t"

@@ -26,3 +26,6 @@
 *.sym
 *.hex
 .dep
+
+# emacs backup files
+*.~*
