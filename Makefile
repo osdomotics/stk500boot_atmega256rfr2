@@ -21,7 +21,7 @@
 # make program = Download the hex file to the device, using avrdude.
 #                Please customize the avrdude settings below first!
 #
-# make debug = Start either simulavr or avarice as specified for debugging, 
+# make debug = Start either simulavr or avarice as specified for debugging,
 #              with avr-gdb or avr-insight as the front end for debugging.
 #
 # make filename.s = Just compile filename.c into the assembler code only.
@@ -45,8 +45,8 @@ FUSES = -U hfuse:w:0x98:m -U lfuse:w:0xf6:m -U efuse:w:0xfe:m
 
 
 # Processor frequency.
-#     This will define a symbol, F_CPU, in all source code files equal to the 
-#     processor frequency. You can then use this symbol in your source code to 
+#     This will define a symbol, F_CPU, in all source code files equal to the
+#     processor frequency. You can then use this symbol in your source code to
 #     calculate timings. Do NOT tack on a 'UL' at the end, this will be done
 #     automatically to create a 32-bit value in your source code.
 F_CPU = 16000000
@@ -83,7 +83,7 @@ TARGET = stk500boot
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = stk500boot.c 
+SRC = stk500boot.c flash_write.c flash_layout.c
 
 
 # List Assembler source files here.
@@ -93,11 +93,11 @@ SRC = stk500boot.c
 #     Even though the DOS/Win* filesystem matches both .s and .S the same,
 #     it will preserve the spelling of the filenames, and gcc itself does
 #     care about how the name is spelled on its command-line.
-# jumptable.S is the storage for the MAC Address for guhRF devices 
+# jumptable.S is the storage for the MAC Address for guhRF devices
 ASRC = jumptable.S
 
 
-# Optimization level, can be [0, 1, 2, 3, s]. 
+# Optimization level, can be [0, 1, 2, 3, s].
 #     0 = turn off optimization. s = optimize for size.
 #     (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 OPT = s
@@ -114,7 +114,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = 
+EXTRAINCDIRS =
 
 
 # Compiler flag to set the C Standard level.
@@ -158,7 +158,7 @@ CFLAGS += $(CSTANDARD)
 #             for use in COFF files, additional information about filenames
 #             and function names needs to be present in the assembler source
 #             files -- see avr-libc docs [FIXME: not yet described there]
-ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs 
+ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
 
 
 #---------------- Library Options ----------------
@@ -169,7 +169,7 @@ PRINTF_LIB_MIN = -Wl,-u,vfprintf -lprintf_min
 PRINTF_LIB_FLOAT = -Wl,-u,vfprintf -lprintf_flt
 
 # If this is left blank, then it will use the Standard printf version.
-PRINTF_LIB = 
+PRINTF_LIB =
 #PRINTF_LIB = $(PRINTF_LIB_MIN)
 #PRINTF_LIB = $(PRINTF_LIB_FLOAT)
 
@@ -181,7 +181,7 @@ SCANF_LIB_MIN = -Wl,-u,vfscanf -lscanf_min
 SCANF_LIB_FLOAT = -Wl,-u,vfscanf -lscanf_flt
 
 # If this is left blank, then it will use the Standard scanf version.
-SCANF_LIB = 
+SCANF_LIB =
 #SCANF_LIB = $(SCANF_LIB_MIN)
 #SCANF_LIB = $(SCANF_LIB_FLOAT)
 
@@ -223,7 +223,7 @@ LDFLAGS += -Wl,--section-start=.text=$(BOOTLOADER_ADDRESS)
 
 #---------------- Programming Options (avrdude) ----------------
 
-# Programming hardware: alf avr910 avrisp bascom bsd 
+# Programming hardware: alf avr910 avrisp bascom bsd
 # dt006 pavr picoweb pony-stk200 sp12 stk200 stk500
 #
 # Type: avrdude -c ?
@@ -254,11 +254,11 @@ AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 #AVRDUDE_NO_VERIFY = -V
 
 # Increase verbosity level.  Please use this when submitting bug
-# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude> 
+# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude>
 # to submit bug reports.
 #AVRDUDE_VERBOSE = -v -v
 
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) 
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
@@ -288,7 +288,7 @@ JTAG_DEV = /dev/com1
 DEBUG_PORT = 4242
 
 # Debugging host used to communicate between GDB / avarice / simulavr, normally
-#     just set to localhost unless doing some sort of crazy debugging when 
+#     just set to localhost unless doing some sort of crazy debugging when
 #     avarice is running on a different computer.
 DEBUG_HOST = localhost
 
@@ -315,7 +315,7 @@ WINSHELL = cmd
 MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = -------- begin --------
 MSG_END = --------  end  --------
-MSG_SIZE_BEFORE = Size before: 
+MSG_SIZE_BEFORE = Size before:
 MSG_SIZE_AFTER = Size after:
 MSG_COFF = Converting to AVR COFF:
 MSG_EXTENDED_COFF = Converting to AVR Extended COFF:
@@ -332,10 +332,10 @@ MSG_CLEANING = Cleaning project:
 
 
 # Define all object files.
-OBJ = $(SRC:.c=.o) $(ASRC:.S=.o) 
+OBJ = $(SRC:.c=.o) $(ASRC:.S=.o)
 
 # Define all listing files.
-LST = $(SRC:.c=.lst) $(ASRC:.S=.lst) 
+LST = $(SRC:.c=.lst) $(ASRC:.S=.lst)
 
 
 # Compiler flags to generate dependency files.
@@ -355,7 +355,7 @@ mega1280: MCU = atmega1280
 mega1280: F_CPU = 16000000
 mega1280: BOOTLOADER_ADDRESS = 1E000
 mega1280: CFLAGS += -D_MEGA_BOARD_
-mega1280: begin gccversion sizebefore build sizeafter end 
+mega1280: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_mega1280.hex
 
 
@@ -365,7 +365,7 @@ mega2560:	MCU = atmega2560
 mega2560:	F_CPU = 16000000
 mega2560:	BOOTLOADER_ADDRESS = 3E000
 mega2560:	CFLAGS += -D_MEGA_BOARD_
-mega2560:	begin gccversion sizebefore build sizeafter end 
+mega2560:	begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_mega2560.hex
 
 
@@ -382,7 +382,7 @@ amber128: MCU = atmega128
 amber128: F_CPU = 14745600
 amber128: BOOTLOADER_ADDRESS = 1E000
 amber128: CFLAGS += -D_BOARD_AMBER128_
-amber128: begin gccversion sizebefore build sizeafter end 
+amber128: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_amber128.hex
 
 ############################################################
@@ -391,7 +391,7 @@ m2561: MCU = atmega2561
 m2561: F_CPU = 8000000
 m2561: BOOTLOADER_ADDRESS = 3E000
 m2561: CFLAGS += -D_ANDROID_2561_ -DBAUDRATE=57600
-m2561: begin gccversion sizebefore build sizeafter end 
+m2561: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_android2561.hex
 
 
@@ -401,13 +401,13 @@ m2561: begin gccversion sizebefore build sizeafter end
 #	avrdude: safemode: hfuse reads as 18
 #	avrdude: safemode: efuse reads as FD
 #	Aug 23,	2010	<MLS> Adding cerebot 2560 @ 8mhz
-#avrdude -P usb -c usbtiny -p m2560 -v -U flash:w:/Arduino/WiringBootV2_upd1/stk500boot_v2_cerebotplus.hex 
+#avrdude -P usb -c usbtiny -p m2560 -v -U flash:w:/Arduino/WiringBootV2_upd1/stk500boot_v2_cerebotplus.hex
 ############################################################
 cerebot:	MCU = atmega2560
 cerebot:	F_CPU = 8000000
 cerebot:	BOOTLOADER_ADDRESS = 3E000
 cerebot:	CFLAGS += -D_CEREBOTPLUS_BOARD_ -DBAUDRATE=38400 -DUART_BAUDRATE_DOUBLE_SPEED=1
-cerebot:	begin gccversion sizebefore build sizeafter end 
+cerebot:	begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_cerebotplus.hex
 
 
@@ -417,7 +417,7 @@ penguino: MCU = atmega32
 penguino: F_CPU = 16000000
 penguino: BOOTLOADER_ADDRESS = 7800
 penguino: CFLAGS += -D_PENGUINO_ -DBAUDRATE=57600
-penguino: begin gccversion sizebefore build sizeafter end 
+penguino: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_penguino.hex
 
 ############################################################
@@ -426,11 +426,11 @@ penguino: begin gccversion sizebefore build sizeafter end
 #x2 because we're addressing in bytes, not words.
 meshthing: MCU = atmega256rfr2
 meshthing: F_CPU = 16000000
-meshthing: BOOTLOADER_ADDRESS = 3E000 
+meshthing: BOOTLOADER_ADDRESS = 3E000
 #meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
 #meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 meshthing: CFLAGS += -D_BOARD_MESHTHING_2564RFR2_ -D_DEBUG_SERIAL_
-meshthing: begin gccversion sizebefore build sizeafter end 
+meshthing: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
@@ -439,12 +439,12 @@ meshthing: begin gccversion sizebefore build sizeafter end
 #x2 because we're addressing in bytes, not words.
 guhRF: MCU = atmega256rfr2
 guhRF: F_CPU = 16000000
-guhRF: BOOTLOADER_ADDRESS = 3E000 
+guhRF: BOOTLOADER_ADDRESS = 3E000
 guhRF: LDFLAGS  += -Wl,--section-start=.jumps=0x3FF80
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
 #guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 guhRF: CFLAGS += -D_BOARD_GUHRF_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
-guhRF: begin gccversion sizebefore build sizeafter end 
+guhRF: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
@@ -453,12 +453,12 @@ guhRF: begin gccversion sizebefore build sizeafter end
 #x2 because we're addressing in bytes, not words.
 raspbee: MCU = atmega256rfr2
 raspbee: F_CPU = 16000000
-raspbee: BOOTLOADER_ADDRESS = 3E000 
+raspbee: BOOTLOADER_ADDRESS = 3E000
 raspbee: LDFLAGS += -Wl,--section-start=.jumps=0x3FF80
 #raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=38400 -D_DEBUG_SERIAL_
-#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_ 
+#raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=9600 -D_DEBUG_SERIAL_
 raspbee: CFLAGS += -D_BOARD_RASPBEE_ -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
-raspbee: begin gccversion sizebefore build sizeafter end 
+raspbee: begin gccversion sizebefore build sizeafter end
 			cp $(TARGET).hex stk500boot_v2_m256rfr2.hex
 
 ############################################################
@@ -470,7 +470,7 @@ osd: LDFLAGS += -Wl,--section-start=.jumps=$(JUMPTABLE_ADDR)
 osd: OSD_TARGET = merkur
 osd: CFLAGS += '-DOSD_TARGET=$(OSD_TARGET)'
 osd: CFLAGS += -DBAUDRATE=57600 -DPARAMS_EUI64ADDR='${PARAMS_EUI64ADDR}'
-osd: begin gccversion sizebefore build sizeafter end 
+osd: begin gccversion sizebefore build sizeafter end
 	cp $(TARGET).hex stk500boot_v2_$(MCU).hex
 
 # Two variants: One with atmega256rfr2, one with atmega128rfa1
@@ -492,7 +492,7 @@ build: elf hex eep lss sym
 elf: $(TARGET).elf
 hex: $(TARGET).hex
 eep: $(TARGET).eep
-lss: $(TARGET).lss 
+lss: $(TARGET).lss
 sym: $(TARGET).sym
 
 
@@ -524,22 +524,22 @@ sizeafter:
 
 
 # Display compiler version information.
-gccversion : 
+gccversion :
 	@$(CC) --version
 
 
 
-# Program the device.  
+# Program the device.
 flash: $(TARGET).hex $(TARGET).eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(FUSES)
-	
+
 # Generate avr-gdb config/init file which does the following:
-#     define the reset signal, load the target file, connect to target, and set 
+#     define the reset signal, load the target file, connect to target, and set
 #     a breakpoint at main().
-gdb-config: 
+gdb-config:
 	@$(REMOVE) $(GDBINIT_FILE)
 	@echo define reset >> $(GDBINIT_FILE)
 	@echo SIGNAL SIGHUP >> $(GDBINIT_FILE)
@@ -548,22 +548,22 @@ gdb-config:
 	@echo target remote $(DEBUG_HOST):$(DEBUG_PORT)  >> $(GDBINIT_FILE)
 ifeq ($(DEBUG_BACKEND),simulavr)
 	@echo load  >> $(GDBINIT_FILE)
-endif	
+endif
 	@echo break main >> $(GDBINIT_FILE)
-	
+
 debug: gdb-config $(TARGET).elf
 ifeq ($(DEBUG_BACKEND), avarice)
 	@echo Starting AVaRICE - Press enter when "waiting to connect" message displays.
 	@$(WINSHELL) /c start avarice --jtag $(JTAG_DEV) --erase --program --file \
 	$(TARGET).elf $(DEBUG_HOST):$(DEBUG_PORT)
 	@$(WINSHELL) /c pause
-	
+
 else
 	@$(WINSHELL) /c start simulavr --gdbserver --device $(MCU) --clock-freq \
 	$(DEBUG_MFREQ) --port $(DEBUG_PORT)
 endif
 	@$(WINSHELL) /c start avr-$(DEBUG_UI) --command=$(GDBINIT_FILE)
-	
+
 
 
 
@@ -572,7 +572,7 @@ COFFCONVERT=$(OBJCOPY) --debugging \
 --change-section-address .data-0x800000 \
 --change-section-address .bss-0x800000 \
 --change-section-address .noinit-0x800000 \
---change-section-address .eeprom-0x810000 
+--change-section-address .eeprom-0x810000
 
 
 
@@ -627,7 +627,7 @@ extcoff: $(TARGET).elf
 %.o : %.c
 	@echo
 	@echo $(MSG_COMPILING) $<
-	$(CC) -c $(ALL_CFLAGS) $< -o $@ 
+	$(CC) -c $(ALL_CFLAGS) $< -o $@
 
 
 # Compile: create assembler files from C source files.
@@ -643,7 +643,7 @@ extcoff: $(TARGET).elf
 
 # Create preprocessed source for use in sending a bug report.
 %.i : %.c
-	$(CC) -E -mmcu=$(MCU) -I. $(CFLAGS) $< -o $@ 
+	$(CC) -E -mmcu=$(MCU) -I. $(CFLAGS) $< -o $@
 
 
 # Target: clean project.

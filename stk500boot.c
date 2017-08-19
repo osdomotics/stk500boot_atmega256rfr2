@@ -83,7 +83,7 @@ LICENSE:
 //*	Nov  9,	2010	<MLS> Issue 392:Fixed bug that 3 !!! in code would cause it to jump to monitor
 //*	Jun 24,	2011	<MLS> Removed analogRead (was not used)
 //*	Dec 29,	2011	<MLS> Issue 181: added watch dog timmer support
-//*	Dec 29,	2011	<MLS> Issue 505:  bootloader is comparing the seqNum to 1 or the current sequence 
+//*	Dec 29,	2011	<MLS> Issue 505:  bootloader is comparing the seqNum to 1 or the current sequence
 //*	Jan  1,	2012	<MLS> Issue 543: CMD_CHIP_ERASE_ISP now returns STATUS_CMD_FAILED instead of STATUS_CMD_OK
 //*	Jan  1,	2012	<MLS> Issue 543: Write EEPROM now does something (NOT TESTED)
 //*	Jan  1,	2012	<MLS> Issue 544: stk500v2 bootloader doesn't support reading fuses
@@ -93,8 +93,8 @@ LICENSE:
 //*	these are used to test issues
 //*	http://code.google.com/p/arduino/issues/detail?id=505
 //*	Reported by mark.stubbs, Mar 14, 2011
-//*	The STK500V2 bootloader is comparing the seqNum to 1 or the current sequence 
-//*	(IE: Requiring the sequence to be 1 or match seqNum before continuing).  
+//*	The STK500V2 bootloader is comparing the seqNum to 1 or the current sequence
+//*	(IE: Requiring the sequence to be 1 or match seqNum before continuing).
 //*	The correct behavior is for the STK500V2 to accept the PC's sequence number, and echo it back for the reply message.
 #define	_FIX_ISSUE_505_
 //************************************************************************
@@ -111,7 +111,7 @@ LICENSE:
 #include	<avr/common.h>
 #include	<stdlib.h>
 #include	"command.h"
-
+#include        "flash_write.h"
 
 #if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
 	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR) || defined( _BOARD_MESHTHING_2564RFR2_ ) || defined(_BOARD_GUHRF_) || defined( _BOARD_RASPBEE_ ) || defined( OSD_TARGET )
@@ -247,7 +247,7 @@ LICENSE:
 	#define BOOT_DDR		DDRB
 	#define BOOT_PIN		PINB7
 	#define BOOT_PIN_REG		PINB
-	
+
 #else
 	#define PROGLED_PORT	PORTG
 	#define PROGLED_DDR		DDRG
@@ -291,19 +291,6 @@ LICENSE:
 #define CONFIG_PARAM_HW_VER				0x0F
 #define CONFIG_PARAM_SW_MAJOR			2
 #define CONFIG_PARAM_SW_MINOR			0x0A
-
-/*
- * Calculate the address where the bootloader starts from FLASHEND and BOOTSIZE
- * (adjust BOOTSIZE below and BOOTLOADER_ADDRESS in Makefile if you want to change the size of the bootloader)
- */
-//#define BOOTSIZE 1024
-#if FLASHEND > 0x0F000
-	#define BOOTSIZE 8192
-#else
-	#define BOOTSIZE 2048
-#endif
-
-#define APP_END  (FLASHEND -(2*BOOTSIZE) + 1)
 
 /*
  * Signature bytes are not available in avr-gcc io_xxx.h
@@ -460,15 +447,6 @@ LICENSE:
 #define	ST_PROCESS		7
 
 /*
- * use 16bit address variable for ATmegas with <= 64K flash
- */
-#if defined(RAMPZ)
-	typedef uint32_t address_t;
-#else
-	typedef uint16_t address_t;
-#endif
-
-/*
  * function prototypes
  */
 static void sendchar(char c);
@@ -588,46 +566,12 @@ void (*app_start)(void) = 0x0000;
 /* IEU64 Mac address */
 const uint8_t default_mac_address[] PROGMEM = PARAMS_EUI64ADDR;
 
-int _write_page_to_flash (address_t address, unsigned int size, unsigned char *p) {
-	unsigned int	data;
-	unsigned char	highByte, lowByte;
-	address_t	tempaddress	=	address;
-
-	// erase only main section (bootloader protection)
-	if (address + size > APP_END)
-		return -1 ;
-
-	if (size > SPM_PAGESIZE)
-		return -2 ;
-
-	boot_page_erase(address);	// Perform page erase
-	boot_spm_busy_wait();		// Wait until the memory is erased.
-
-	/* Write FLASH */
-	do {
-		lowByte		=	*p++;
-		highByte 	=	*p++;
-
-		data		=	(highByte << 8) | lowByte;
-		boot_page_fill(address,data);
-
-		address	=	address + 2;	// Select next word in memory
-		size	-=	2;				// Reduce number of bytes to write by two
-	} while (size);					// Loop until all bytes written
-
-	boot_page_write(tempaddress);
-	boot_spm_busy_wait();
-	boot_rww_enable();				// Re-enable the RWW section
-
-	return 0;
-}
-
 //*****************************************************************************
 int main(void)
 {
-	address_t		address			=	0;
+	address_t	address			=	0;
 	unsigned char	msgParseState;
-	unsigned int	ii				=	0;
+        unsigned int    ii                      =       0;
 	unsigned char	checksum		=	0;
 	unsigned char	seqNum			=	0;
 	unsigned int	msgLength		=	0;
@@ -640,7 +584,7 @@ int main(void)
 	unsigned int	boot_state;
 #ifdef ENABLE_MONITOR
 	unsigned int	exPointCntr		=	0;
-	unsigned int	rcvdCharCntr	=	0;
+	unsigned int	rcvdCharCntr		=	0;
 #endif
 
 	//*	some chips dont set the stack properly
@@ -687,7 +631,7 @@ int main(void)
 	BOOT_PORT	&= ~(1<<BOOT_PIN); // no Pull-Up
 	STATUSLED_DDR	|=  (1<<STATUSLED_PIN);
 	STATUSLED_PORT	|=  (1<<STATUSLED_PIN);
-	
+
 	if (BOOT_PIN_REG &(1<<BOOT_PIN)){
 		STATUSLED_PORT &= ~(1<<STATUSLED_PIN);	// turn LED on
 	}
@@ -731,7 +675,7 @@ int main(void)
 	UBRR1H = (UART_BAUD_SELECT(BAUDRATE,F_CPU)>>8);
 	UART_BAUD_RATE_LOW	=	UART_BAUD_SELECT(BAUDRATE,F_CPU);
 
-	UCSR1C |= (0 << USBS1) | (1 << UCSZ10) | (1 << UCSZ11);	
+	UCSR1C |= (0 << USBS1) | (1 << UCSZ10) | (1 << UCSZ11);
 */
 
 	#  define UCSRA UCSR0A
@@ -745,11 +689,11 @@ int main(void)
 	#  define UDR UDR0
 
 	#define BAUDRATE 57600
-//	#define BAUD_PRESCALE (F_CPU / 16 / BAUDRATE -1)   
+//	#define BAUD_PRESCALE (F_CPU / 16 / BAUDRATE -1)
 
 //trying double speed as it has less error at 115200...
-	#define BAUD_PRESCALE (F_CPU / 8 / BAUDRATE -1)   
-	UCSRA |= 1 << U2X0;	
+	#define BAUD_PRESCALE (F_CPU / 8 / BAUDRATE -1)
+	UCSRA |= 1 << U2X0;
 
 	// Clear double speed operation
 	//UCSRA &= ~(1 << U2X1);
@@ -799,7 +743,7 @@ int main(void)
 		#ifdef BLINK_LED_WHILE_WAITING
 			if ((boot_timer % _BLINK_LOOP_COUNT_) == 0)
 			{
-	
+
 #ifdef _DEBUG_SERIAL_
 				sendchar('b');
 #endif
@@ -837,7 +781,7 @@ int main(void)
 				{
 				//	c	=	recchar();
 					c	=	recchar_timeout();
-					
+
 				}
 
 			#ifdef ENABLE_MONITOR
@@ -1245,7 +1189,7 @@ int main(void)
 			}
 			sendchar(checksum);
 			seqNum++;
-	
+
 		#ifndef REMOVE_BOOTLOADER_LED
 			//*	<MLS>	toggle the LED
 			PROGLED_PORT	^=	(1<<PROGLED_PIN);	// active high LED ON
@@ -1731,7 +1675,7 @@ int		errorCount;
 
 
 #if (FLASHEND > 0x08000)
-//*	this includes the interrupt names for the monitor portion. There is no longer enough 
+//*	this includes the interrupt names for the monitor portion. There is no longer enough
 //*	memory to include this
 //	#include	"avrinterruptnames.h"
 //	#ifndef _INTERRUPT_NAMES_DEFINED_
@@ -1778,7 +1722,7 @@ unsigned long	absoluteAddr;
 		sendchar('=');
 		sendchar(0x20);
 
-	
+
 		//*	the AVR is LITTLE ENDIAN, swap the byte order
 	#if (FLASHEND > 0x10000)
 		byte1	=	pgm_read_byte_far(myMemoryPtr++);
@@ -1803,7 +1747,7 @@ unsigned long	absoluteAddr;
 		sendchar(0x20);
 		PrintHexByte(byte3);
 		sendchar(0x20);
-	
+
 		if (word1 == 0xffff)
 		{
 			PrintFromPROGMEM(gTextMsg_noVector, 0);
@@ -1823,7 +1767,7 @@ unsigned long	absoluteAddr;
 			PrintHexByte((absoluteAddr >> 16) & 0x00ff);
 			PrintHexByte((absoluteAddr >> 8) & 0x00ff);
 			PrintHexByte((absoluteAddr) & 0x00ff);
-	
+
 		}
 		else if ((word1 & 0xfE0E) == 0x940c)
 		{
@@ -1832,9 +1776,9 @@ unsigned long	absoluteAddr;
 								((byte1 & 0xf0) << 17) +
 								((byte2 & 0x01) << 21) +
 								word2;
-							
+
 			absoluteAddr	=	myFullAddress << 1;
-							
+
 			PrintFromPROGMEM(gTextMsg_jmp, 0);
 			PrintHexByte((myFullAddress >> 16) & 0x00ff);
 			PrintHexByte((myFullAddress >> 8) & 0x00ff);
@@ -2191,7 +2135,7 @@ int				ii, jj;
 					gEepromIndex	=	0;
 				}
 				break;
-		
+
 			case 'F':
 				PrintFromPROGMEMln(gTextMsg_HELP_MSG_F, 2);
 				DumpHex(kDUMP_FLASH, gFlashIndex, 16);
@@ -2228,7 +2172,7 @@ int				ii, jj;
 				PrintFromPROGMEMln(gTextMsg_HELP_MSG_Y, 2);
 				AVR_PortOutput();
 				break;
-			
+
 			default:
 				PrintFromPROGMEMln(gTextMsg_HUH, 0);
 				break;
