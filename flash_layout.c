@@ -209,11 +209,11 @@ void fd_read_directory (struct flash_directory_s *result)
 
   if (current_dir == -1) {
     memset (result, 0, sizeof (*result));
-    result->magic = PART_FLASH_DIR_MAGIC;
-    result->version = PART_FLASH_DIR_VERSION;
+    result->magic        = PART_FLASH_DIR_MAGIC;
+    result->version      = PART_FLASH_DIR_VERSION;
     result->change_count = 0;
     result->boot_default = 0;
-    result->boot_next = 0;
+    result->boot_next    = 0;
     return;
   }
 
