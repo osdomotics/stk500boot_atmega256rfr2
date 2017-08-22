@@ -46,5 +46,5 @@ get_boot_default:
 get_boot_next:
     jmp _get_boot_next
 
-get_callers_part:
-    jmp _get_callers_part
+get_active_part:
+    jmp _get_active_part

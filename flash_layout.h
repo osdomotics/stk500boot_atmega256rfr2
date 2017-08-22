@@ -43,17 +43,6 @@
 #define PART_FLASH_DIR_1_START (PART_FLASH_DIR_0_START + PART_FLASH_DIR_SIZE)
 #define PART_FLASH_DIR_MAGIC 0x08154711L
 
-/* determine address of the caller from the stack */
-#define CALLERS_PART \
-    ( ( ( (((uint32_t) (*(((uint8_t *) SP) + 3))) << 16L) \
-        + (((uint32_t) (*(((uint8_t *) SP) + 4))) <<  8L) \
-        + (((uint32_t) (*(((uint8_t *) SP) + 5)))       ) \
-        )                                                 \
-      - PART_IMAGES_START                                 \
-      )                                                   \
-    / PART_SIZE                                           \
-    )
-
 struct flash_directory_s {
     uint32_t magic;
     uint32_t version;
@@ -74,7 +63,7 @@ void     _set_boot_default (uint32_t part_index);
 uint32_t _get_boot_default (void);
 void     _set_boot_next    (uint32_t part_index);
 uint32_t _get_boot_next    (void);
-uint32_t _get_callers_part (void);
+uint32_t _get_active_part  (void);
 void     _backup_irq_table (uint32_t part_index);
 
 void     update_irq_table  (uint32_t part_index);

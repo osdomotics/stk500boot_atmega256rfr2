@@ -42,16 +42,29 @@ static void _set_part_ok_ (uint32_t part_index, uint32_t value)
 {
   struct flash_directory_s fd;
 
-  if (part_index == CALLERS_PART) {
+  if (part_index == _get_active_part ()) {
     fd_read_directory (&fd);
     fd.part_ok [part_index] = value;
     fd_write_directory (&fd);
   }
 }
 
-uint32_t _get_callers_part ()
+/*
+ * Get address of the reset vector (vector 0)
+ * We parse an AVR jmp instruction
+ * This consists of the following bits according to AVR assembler docs:
+ * 1001 010k kkkk 110k kkkk kkkk kkkk kkkk
+ * where k are the jump address bits. The other bits are fixed.
+ * Since this is a *word* address we shift it one bit to the left.
+ * From this address we determine the partition to which the reset
+ * vector points.
+ */
+uint32_t _get_active_part ()
 {
-  return CALLERS_PART;
+  uint32_t jmp =
+    (((uint32_t)pgm_read_word_near (0)) << 16) + pgm_read_word_near (2);
+  uint32_t adr = ((jmp & 0x1FFFF) + ((jmp & 0x1F00000) >> 3)) << 1;
+  return (adr - PART_IMAGES_START) / PART_SIZE;
 }
 
 void _set_part_ok (uint32_t part_index)
