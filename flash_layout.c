@@ -38,6 +38,13 @@ uint32_t _get_part_start (uint32_t part_index)
   return PART_START (part_index);
 }
 
+uint32_t _get_part_ok (uint32_t part_index)
+{
+  struct flash_directory_s fd;
+  fd_read_directory (&fd);
+  return fd.part_ok [part_index];
+}
+
 static void _set_part_ok_ (uint32_t part_index, uint32_t value)
 {
   struct flash_directory_s fd;
@@ -119,6 +126,8 @@ uint32_t _get_boot_next ()
   return fd.boot_next;
 }
 
+/* currently unused, the ota app will do this now */
+#if 0
 void _backup_irq_table (uint32_t part_index)
 {
   address_t src_address;
@@ -138,6 +147,7 @@ void _backup_irq_table (uint32_t part_index)
       );
   }
 }
+#endif
 
 void update_irq_table (uint32_t part_index)
 {

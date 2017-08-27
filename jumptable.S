@@ -5,10 +5,14 @@
 .global get_part_count
 .global get_part_size
 .global get_part_start
+.global get_part_ok
 .global set_part_ok
 .global clr_part_ok
 .global set_boot_default
 .global set_boot_next
+.global get_boot_default
+.global get_boot_next
+.global get_active_part
 
 get_mac:
     jmp _get_mac
@@ -37,8 +41,8 @@ set_boot_default:
 set_boot_next:
     jmp _set_boot_next
 
-backup_irq_table:
-    jmp _backup_irq_table
+get_part_ok:
+    jmp _get_part_ok
 
 get_boot_default:
     jmp _get_boot_default

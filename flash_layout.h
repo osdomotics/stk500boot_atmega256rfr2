@@ -57,6 +57,7 @@ struct flash_directory_s {
 uint32_t _get_part_count   (void);
 uint32_t _get_part_size    (void);
 uint32_t _get_part_start   (uint32_t part_index);
+uint32_t _get_part_ok      (uint32_t part_index);
 void     _set_part_ok      (uint32_t part_index);
 void     _clr_part_ok      (uint32_t part_index);
 void     _set_boot_default (uint32_t part_index);
@@ -64,7 +65,6 @@ uint32_t _get_boot_default (void);
 void     _set_boot_next    (uint32_t part_index);
 uint32_t _get_boot_next    (void);
 uint32_t _get_active_part  (void);
-void     _backup_irq_table (uint32_t part_index);
 
 void     update_irq_table  (uint32_t part_index);
 
