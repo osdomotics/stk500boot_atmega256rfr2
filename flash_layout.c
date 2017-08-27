@@ -49,7 +49,10 @@ static void _set_part_ok_ (uint32_t part_index, uint32_t value)
 {
   struct flash_directory_s fd;
 
-  if (part_index == _get_active_part ()) {
+  /* Allow setting OK flag only if we're booted from that partition
+   * But *do* allow reset of the OK flag!
+   */
+  if (part_index == _get_active_part () || !value) {
     fd_read_directory (&fd);
     fd.part_ok [part_index] = value;
     fd_write_directory (&fd);
