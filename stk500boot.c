@@ -452,6 +452,27 @@ LICENSE:
  */
 static void sendchar(char c);
 static unsigned char recchar(void);
+void start_user (void);
+
+void start_user () {
+    /* start user application from */
+    uint32_t to_boot = _get_boot_next ();
+
+    if (to_boot != _get_boot_default ()) {
+        _set_boot_next (_get_boot_default ());
+    }
+
+    update_irq_table (to_boot);
+
+	UART_STATUS_REG	&=	0xfd;
+	boot_rww_enable();				// enable application section
+
+	asm volatile(
+			"clr	r30		\n\t"
+			"clr	r31		\n\t"
+			"ijmp	\n\t"
+			);
+}
 
 /*
  * since this bootloader is not linked against the avr-gcc crt1 functions,
@@ -560,10 +581,6 @@ uint32_t count = 0;
 	return UART_DATA_REG;
 }
 
-//*	for watch dog timer startup
-void (*app_start)(void) = 0x0000;
-
-
 /* IEU64 Mac address */
 const uint8_t default_mac_address[] PROGMEM = PARAMS_EUI64ADDR;
 
@@ -572,7 +589,7 @@ int main(void)
 {
 	address_t	address			=	0;
 	unsigned char	msgParseState;
-        unsigned int    ii                      =       0;
+    unsigned int    ii                      =       0;
 	unsigned char	checksum		=	0;
 	unsigned char	seqNum			=	0;
 	unsigned int	msgLength		=	0;
@@ -611,7 +628,7 @@ int main(void)
 	// check if WDT generated the reset, if so, go straight to app
 	if (mcuStatusReg & _BV(WDRF))
 	{
-		app_start();
+		start_user ();
 	}
 	//************************************************************************
 #endif
@@ -1243,22 +1260,8 @@ int main(void)
 	 * Now leave bootloader
 	 */
 
-        uint32_t to_boot = _get_boot_next ();
+    start_user ();
 
-        if (to_boot != _get_boot_default ()) {
-                _set_boot_next (_get_boot_default ());
-        }
-
-        update_irq_table (to_boot);
-
-	UART_STATUS_REG	&=	0xfd;
-	boot_rww_enable();				// enable application section
-
-	asm volatile(
-			"clr	r30		\n\t"
-			"clr	r31		\n\t"
-			"ijmp	\n\t"
-			);
 //	asm volatile ( "push r1" "\n\t"		// Jump to Reset vector in Application Section
 //					"push r1" "\n\t"
 //					"ret"	 "\n\t"
@@ -1271,7 +1274,6 @@ int main(void)
 	 */
 	for(;;);
 }
-
 
 //************************************************************************
 #ifdef ENABLE_MONITOR
